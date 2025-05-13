@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boo-Keep</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>BOO-KEEP</h1>
+    </header>
+    
+    <main>
+        <section id="search-section">
+            <h2>Search Books</h2>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search for books...">
+                <button id="search-button">Search</button>
+            </div>
+            <div id="search-results" class="book-grid"></div>
+        </section>
+
+        <section id="bookshelf-section">
+            <h2>My Bookshelf</h2>
+            <div class="filter-container">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="read">Read</button>
+                <button class="filter-btn" data-filter="want-to-read">Want to Read</button>
+            </div>
+            <div id="bookshelf" class="book-grid"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Enjoy your stay</p>
+    </footer>
+
+    <div id="book-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-body">
+                <div class="modal-cover">
+                    <img src="" alt="Book cover">
+                </div>
+                <div class="modal-info">
+                    <h3 class="modal-title"></h3>
+                    <p class="modal-subjects"></p>
+                    <div class="modal-description"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="book-template">
+        <div class="book-card">
+            <div class="book-cover">
+                <img src="" alt="Book cover">
+            </div>
+            <div class="book-info">
+                <h3 class="book-title"></h3>
+                <p class="book-author"></p>
+                <div class="book-actions">
+                    <button class="add-to-shelf">Add to Shelf</button>
+                    <div class="status-controls hidden">
+                        <select class="reading-status">
+                            <option value="want-to-read">Want to Read</option>
+                            <option value="read">Read</option>
+                        </select>
+                        <button class="remove-book">Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="js/storage.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
