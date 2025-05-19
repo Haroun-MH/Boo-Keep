@@ -1,14 +1,4 @@
-/**
- * api.js - Open Library API integration
- * Handles all communication with the Open Library API
- */
-
 const BookAPI = {
-    /**
-     * Search for books using the Open Library API
-     * @param {string} query - The search term
-     * @returns {Promise} - Promise containing the search results
-     */
     searchBooks: async function(query) {
         if (!query || query.trim() === '') {
             return [];
@@ -47,11 +37,6 @@ const BookAPI = {
         }
     },
 
-    /**
-     * Get detailed information about a book
-     * @param {string} olid - The Open Library ID
-     * @returns {Promise} - Promise containing the book details
-     */
     getBookDetails: async function(olid) {
         try {
             const response = await fetch(`https://openlibrary.org/works/${olid}.json`);

@@ -1,10 +1,4 @@
-/**
- * app.js - Main application logic
- * Handles DOM manipulation, event listeners, and connects API and storage
- */
-
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
     const searchResults = document.getElementById('search-results');
@@ -14,20 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('book-detail-modal');
     const closeModal = document.querySelector('.close-modal');
     
-    // Current filter state
     let currentFilter = 'all';
     
-    // Initialize the application
     init();
     
-    /**
-     * Initialize the application
-     */
     function init() {
-        // Load saved books
         renderBookshelf();
         
-        // Set up event listeners
         searchButton.addEventListener('click', handleSearch);
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -35,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Filter buttons
         filterButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
@@ -44,28 +30,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Modal close button
         closeModal.addEventListener('click', function() {
             modal.classList.remove('show');
         });
         
-        // Close modal when clicking outside
         window.addEventListener('click', function(event) {
             if (event.target === modal) {
                 modal.classList.remove('show');
             }
         });
         
-        // Set up bookshelf as a drop target
         bookshelf.addEventListener('dragover', function(e) {
-            e.preventDefault(); // Allow drop
+            e.preventDefault();
         });
     }
     
-    /**
-     * Set active filter button
-     * @param {string} filter - Filter to set active
-     */
     function setActiveFilter(filter) {
         currentFilter = filter;
         
@@ -78,9 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    /**
-     * Handle search form submission
-     */
     async function handleSearch() {
         const query = searchInput.value.trim();
         
@@ -88,20 +64,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Show loading state
         searchResults.innerHTML = '<div class="loading">Searching books...</div>';
         
-        // Fetch books from API
         const books = await BookAPI.searchBooks(query);
         
-        // Display results
         renderSearchResults(books);
     }
     
-    /**
-     * Render search results
-     * @param {Array} books - Array of book objects
-     */
     function renderSearchResults(books) {
         searchResults.innerHTML = '';
         
@@ -116,10 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    /**
-     * Render the bookshelf with saved books
-     * @param {string} filter - Filter to apply ('all', 'read', or 'want-to-read')
-     */
     function renderBookshelf(filter = currentFilter) {
         bookshelf.innerHTML = '';
         
@@ -136,17 +101,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    /**
-     * Create a book element from template
-     * @param {Object} book - Book object
-     * @param {boolean} isInBookshelf - Whether the book is in the bookshelf
-     * @returns {HTMLElement} - Book element
-     */
     function createBookElement(book, isInBookshelf) {
         const template = bookTemplate.content.cloneNode(true);
         const bookCard = template.querySelector('.book-card');
         
-        // Set book data
         bookCard.dataset.id = book.id;
         bookCard.dataset.olid = book.olid;
         
@@ -157,21 +115,17 @@ document.addEventListener('DOMContentLoaded', function() {
         bookCard.querySelector('.book-title').textContent = book.title;
         bookCard.querySelector('.book-author').textContent = book.authors;
         
-        // Set up action buttons
         const addButton = bookCard.querySelector('.add-to-shelf');
         const statusControls = bookCard.querySelector('.status-controls');
         const statusSelect = bookCard.querySelector('.reading-status');
         const removeButton = bookCard.querySelector('.remove-book');
         
         if (isInBookshelf) {
-            // Book is in bookshelf - show status controls
             addButton.classList.add('hidden');
             statusControls.classList.remove('hidden');
             
-            // Set current status
             statusSelect.value = book.status;
             
-            // Add event listeners for bookshelf actions
             statusSelect.addEventListener('change', function() {
                 BookStorage.updateBookStatus(book.id, this.value);
                 renderBookshelf();
@@ -182,10 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 renderBookshelf();
             });
             
-            // Make bookshelf items draggable
             bookCard.setAttribute('draggable', 'true');
             
-            // Add drag event listeners
             bookCard.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', book.id);
                 bookCard.classList.add('dragging');
@@ -221,12 +173,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         } else {
-            // Book is in search results - show add button
             addButton.addEventListener('click', function() {
                 BookStorage.saveBook(book, 'want-to-read');
                 renderBookshelf();
                 
-                // Show feedback
                 this.textContent = 'Added!';
                 this.disabled = true;
                 setTimeout(() => {
@@ -236,9 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Add click event to show book details
         bookCard.addEventListener('click', function(event) {
-            // Don't show details if clicking on buttons or select
             if (event.target.tagName === 'BUTTON' || 
                 event.target.tagName === 'SELECT' || 
                 event.target.closest('.book-actions')) {
@@ -251,31 +199,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return bookCard;
     }
     
-    /**
-     * Show book detail modal
-     * @param {string} olid - Open Library ID
-     */
     async function showBookDetailModal(olid) {
-        // Show loading state
         modal.querySelector('.modal-title').textContent = 'Loading...';
         modal.querySelector('.modal-subjects').textContent = '';
         modal.querySelector('.modal-description').textContent = 'Loading book details...';
         modal.querySelector('.modal-cover img').src = 'https://via.placeholder.com/200x300?text=Loading';
         
-        // Show modal with animation
         modal.classList.add('show');
         
-        // Fetch book details
         const details = await BookAPI.getBookDetails(olid);
         
         if (details) {
-            // Update modal content
             modal.querySelector('.modal-title').textContent = details.title;
             modal.querySelector('.modal-subjects').textContent = details.subjects;
             modal.querySelector('.modal-description').innerHTML = details.description;
             modal.querySelector('.modal-cover img').src = details.coverImage;
         } else {
-            // Show error
             modal.querySelector('.modal-title').textContent = 'Error';
             modal.querySelector('.modal-subjects').textContent = '';
             modal.querySelector('.modal-description').textContent = 'Could not load book details. Please try again.';
